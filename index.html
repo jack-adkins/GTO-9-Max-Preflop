@@ -1,182 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preflop Charts Tester</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-            color: #19451b; /* Dark green text */
-            background: linear-gradient(rgba(232, 245, 233, 0.85), rgba(232, 245, 233, 0.85)), url('poker_background.jpg');
-            background-size: cover; /* Ensure it covers the entire page */
-            background-repeat: no-repeat; /* Prevent repeating the image */
-            background-attachment: fixed; /* Keeps the image in place on scroll */
-            padding-top: 20px
-        }
-        select, button {
-            margin: 10px;
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #81c784;
-            border-radius: 5px;
-            background-color: #c8e6c9; /* Light green button background */
-            color: #19451b; /* Dark green text */
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        button:hover {
-            background-color: #81c784; /* Slightly darker green on hover */
-            transform: scale(1.05); /* Slight zoom effect */
-        }
-        #hand-display {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 20px;
-            color: #19451b; /* Darker green for the hand display */
-        }
-        #hand {
-            font-size: 64px; /* Larger font size for the hand */
-            font-weight: bold;
-            color: #1b5e20; /* Dark green for the hand */
-            margin-top: 10px;
-        }
-        .feedback {
-            font-size: 18px;
-            margin: 20px;
-            padding: 10px;
-            border: 2px solid #19451b;
-            border-radius: 5px;
-            display: inline-block;
-            transition: background-color 0.3s ease;
-        }
-        .feedback.correct {
-            background-color: #bbdefb; /* Blue background for correct */
-            color: #0d47a1; /* Dark blue text */
-        }
-        .feedback.incorrect {
-            background-color: #ffcdd2; /* Red background for incorrect */
-            color: #b71c1c; /* Dark red text */
-        }
-        .tracker {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-    </style>
-</head>
-<body>
-    <h1>9-Max Preflop Charts Tester</h1>
-    <p>Select your table position to start practicing:</p>
-    <select id="position-select">
-        <option value="utg">UTG</option>
-        <option value="utg_1">UTG+1</option>
-        <option value="middle_position">Middle Position</option>
-        <option value="low_jack">Low Jack</option>
-        <option value="high_jack">High Jack</option>
-        <option value="cutoff">Cutoff</option>
-        <option value="button">Button</option>
-    </select>
-    <button onclick="startPractice()">Start Practice</button>
-    <div id="hand-display">
-        Current Hand:
-        <div id="hand"></div>
-    </div>
-    <button onclick="checkAnswer('raise')" disabled>Raise</button>
-    <button onclick="checkAnswer('fold')" disabled>Fold</button>
-    <div id="feedback" class="feedback"></div>
-    <div class="tracker">
-        <p>Correct: <span id="correct-count">0</span></p>
-        <p>Incorrect: <span id="incorrect-count">0</span></p>
-    </div>
-    <button class="return-button" onclick="window.location.href='charts.html'">View Preflop Charts</button>
-
-    <script>
-        const handsByPosition = {
-            utg: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A5s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo"],
-            utg_1: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A5s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "QTs", "A4s", "K9s"],
-            middle_position: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A5s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "QTs", "A4s", "K9s", "A7s", "A6s", "77", "66", "KJo", "T9s"],
-            low_jack: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A5s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "QTs", "A4s", "K9s", "A7s", "A6s", "77", "66", "KJo", "T9s", "A3s", "ATo", "K8s", "Q9s", "J9s"],
-            high_jack: ["AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s", "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "QJs", "QTs", "Q9s", "JTs", "J9s", "T9s", "98s", "AKo", "AQo", "AJo", "ATo", "KQo", "KJo", "KTo", "QJo"],
-            cutoff: ["AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s", "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "QJs", "QTs", "Q9s", "JTs", "J9s", "T9s", "98s", "AKo", "AQo", "AJo", "ATo", "KQo", "KJo", "KTo", "QJo", "K5s", "K4s", "Q8s", "J8s", "T8s", "87s", "76s", "A9o", "QTo", "JTo"],
-            button: ["AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s", "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s", "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "Q3s", "JTs", "J9s", "J8s", "J7s", "T9s", "T8s", "T7s", "T6s", "98s", "97s", "96s", "87s", "86s", "76s", "65s", "54s", "AKo", "AQo", "AJo", "ATo", "A9o", "A8o", "A7o", "A6o", "A5o", "A4o", "KQo", "KJo", "KTo", "K9o", "K8o", "QJo", "QTo", "Q9o", "JTo", "J9o", "T9o"]
-        };
-
-        const startingHands = [
-            "AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22",
-            "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s",
-            "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s",
-            "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "Q3s", "Q2s",
-            "JTs", "J9s", "J8s", "J7s", "J6s", "J5s", "J4s", "J3s", "J2s",
-            "T9s", "T8s", "T7s", "T6s", "T5s", "T4s", "T3s", "T2s",
-            "98s", "97s", "96s", "95s", "94s", "93s", "92s",
-            "87s", "86s", "85s", "84s", "83s", "82s",
-            "76s", "75s", "74s", "73s", "72s",
-            "65s", "64s", "63s", "62s",
-            "54s", "53s", "52s",
-            "43s", "42s",
-            "32s",
-            "AKo", "AQo", "AJo", "ATo", "A9o", "A8o", "A7o", "A6o", "A5o", "A4o", "A3o", "A2o",
-            "KQo", "KJo", "KTo", "K9o", "K8o", "K7o", "K6o", "K5o", "K4o", "K3o", "K2o",
-            "QJo", "QTo", "Q9o", "Q8o", "Q7o", "Q6o", "Q5o", "Q4o", "Q3o", "Q2o",
-            "JTo", "J9o", "J8o", "J7o", "J6o", "J5o", "J4o", "J3o", "J2o",
-            "T9o", "T8o", "T7o", "T6o", "T5o", "T4o", "T3o", "T2o",
-            "98o", "97o", "96o", "95o", "94o", "93o", "92o",
-            "87o", "86o", "85o", "84o", "83o", "82o",
-            "76o", "75o", "74o", "73o", "72o",
-            "65o", "64o", "63o", "62o",
-            "54o", "53o", "52o",
-            "43o", "42o",
-            "32o"
-        ];
-
-        let selectedPosition = "";
-        let currentHand = "";
-        let correctCount = 0;
-        let incorrectCount = 0;
-
-        function startPractice() {
-            const positionSelect = document.getElementById("position-select");
-            selectedPosition = positionSelect.value;
-            correctCount = 0;
-            incorrectCount = 0;
-            updateTracker();
-            document.getElementById("feedback").textContent = "";
-            document.getElementById("feedback").className = "feedback";
-            pickRandomHand();
-            document.querySelectorAll("button[onclick^='checkAnswer']").forEach(button => button.disabled = false);
-        }
-
-        function pickRandomHand() {
-            const randomIndex = Math.floor(Math.random() * startingHands.length);
-            currentHand = startingHands[randomIndex];
-            document.getElementById("hand").textContent = currentHand; // Display only the hand in larger font
-        }
-
-        function checkAnswer(action) {
-            const isRaise = handsByPosition[selectedPosition].includes(currentHand);
-            const correctDecision = isRaise ? "raise" : "fold";
-            const userCorrect = (action === correctDecision);
-
-            const feedback = document.getElementById("feedback");
-            if (userCorrect) {
-                correctCount++;
-                feedback.textContent = `Correct! ${currentHand} should be a ${correctDecision}.`;
-                feedback.className = "feedback correct";
-            } else {
-                incorrectCount++;
-                feedback.textContent = `Incorrect! ${currentHand} should be a ${correctDecision}.`;
-                feedback.className = "feedback incorrect";
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Preflop Charts Tester</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                margin: 20px;
+                color: #19451b; /* Dark green text */
+                background: linear-gradient(rgba(232, 245, 233, 0.85), rgba(232, 245, 233, 0.85)), url('poker_background.jpg');
+                background-size: cover; /* Ensure it covers the entire page */
+                background-repeat: no-repeat; /* Prevent repeating the image */
+                background-attachment: fixed; /* Keeps the image in place on scroll */
+                padding-top: 20px
             }
-            updateTracker();
-            pickRandomHand();
-        }
+            select, button {
+                margin: 10px;
+                padding: 10px;
+                font-size: 16px;
+                border: 2px solid #81c784;
+                border-radius: 5px;
+                background-color: #c8e6c9; /* Light green button background */
+                color: #19451b; /* Dark green text */
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+            button:hover {
+                background-color: #81c784; /* Slightly darker green on hover */
+                transform: scale(1.05); /* Slight zoom effect */
+            }
+            #hand-display {
+                font-size: 24px;
+                font-weight: bold;
+                margin: 20px;
+                color: #19451b; /* Darker green for the hand display */
+            }
+            #hand {
+                font-size: 64px; /* Larger font size for the hand */
+                font-weight: bold;
+                color: #1b5e20; /* Dark green for the hand */
+                margin-top: 10px;
+            }
+            .feedback {
+                font-size: 18px;
+                margin: 20px;
+                padding: 10px;
+                border: 2px solid #19451b;
+                border-radius: 5px;
+                display: inline-block;
+                transition: background-color 0.3s ease;
+            }
+            .feedback.correct {
+                background-color: #bbdefb; /* Blue background for correct */
+                color: #0d47a1; /* Dark blue text */
+            }
+            .feedback.incorrect {
+                background-color: #ffcdd2; /* Red background for incorrect */
+                color: #b71c1c; /* Dark red text */
+            }
+            .tracker {
+                margin-top: 20px;
+                font-size: 18px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>8-Max Preflop Charts Tester</h1>
+        <p>Select your table position to start practicing:</p>
+        <select id="position-select">
+            <option value="utg">UTG</option>
+            <option value="utg_1">UTG+1</option>
+            <option value="middle_position">Middle Position</option>
+            <option value="high_jack">High Jack</option>
+            <option value="cutoff">Cutoff</option>
+            <option value="button">Button</option>
+        </select>
+        <button onclick="startPractice()">Start Practice</button>
+        <div id="hand-display">
+            Current Hand:
+            <div id="hand"></div>
+        </div>
+        <button onclick="checkAnswer('raise')" disabled>Raise</button>
+        <button onclick="checkAnswer('fold')" disabled>Fold</button>
+        <div id="feedback" class="feedback"></div>
+        <div class="tracker">
+            <p>Correct: <span id="correct-count">0</span></p>
+            <p>Incorrect: <span id="incorrect-count">0</span></p>
+        </div>
+        <button class="return-button" onclick="window.location.href='charts.html'">View Preflop Charts</button>
 
-        function updateTracker() {
-            document.getElementById("correct-count").textContent = correctCount;
-            document.getElementById("incorrect-count").textContent = incorrectCount;
-        }
-    </script>
-</body>
+        <script>
+            const handsByPosition = {
+                utg: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "A7s", "A6s", "A5s", "A4s", "K9s", "QTs", "88", "77"],
+                utg_1: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "A7s", "A6s", "A5s", "A4s", "K9s", "QTs", "88", "77", "66", "55", "ATo", "Q9s", "J9s", "T9s", "K8s"],
+                middle_position: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "A7s", "A6s", "A5s", "A4s", "K9s", "QTs", "88", "77", "66", "55", "ATo", "Q9s", "J9s", "T9s", "K8s", "A3s", "A2s", "K7s", "K6s", "98s", "KJo", "KTo", "44", "33", "22"],
+                high_jack: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "A7s", "A6s", "A5s", "A4s", "K9s", "QTs", "88", "77", "66", "55", "ATo", "Q9s", "J9s", "T9s", "K8s", "A3s", "A2s", "K7s", "K6s", "98s", "KJo", "KTo", "QJo", "QTo", "JTo", "K5s", "K4s", "Q8s", "J8s", "T8s", "44", "33", "22", "87s", "76s", "65s", "54s", "97s"],
+                cutoff: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "A7s", "A6s", "A5s", "A4s", "K9s", "QTs", "88", "77", "66", "55", "ATo", "Q9s", "J9s", "T9s", "K8s", "A3s", "A2s", "K7s", "K6s", "98s", "KJo", "KTo", "QJo", "QTo", "JTo", "K5s", "K4s", "Q8s", "J8s", "T8s", "44", "33", "22", "87s", "76s", "65s", "54s", "97s", "A9o", "A8o", "A5o", "K9o", "Q9o", "Q7s", "Q6s", "Q5s", "K3s", "K2s", "J7s", "T7s", "T9o"],
+                button: ["AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s", "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s", "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "Q3s", "JTs", "J9s", "J8s", "J7s", "T9s", "T8s", "T7s", "T6s", "98s", "97s", "96s", "87s", "86s", "76s", "65s", "54s", "AKo", "AQo", "AJo", "ATo", "A9o", "A8o", "A7o", "A6o", "A5o", "A4o", "KQo", "KJo", "KTo", "K9o", "K8o", "QJo", "QTo", "Q9o", "JTo", "J9o", "T9o", "J6s", "A3o", "A2o", "Q2s", "75s", "64s", "Q8o", "J8o", "T8o", "98o", "K7o", "K6o", "K5o", "87o"]
+            };
+
+            const startingHands = [
+                "AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22",
+                "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s",
+                "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s",
+                "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "Q3s", "Q2s",
+                "JTs", "J9s", "J8s", "J7s", "J6s", "J5s", "J4s", "J3s", "J2s",
+                "T9s", "T8s", "T7s", "T6s", "T5s", "T4s", "T3s", "T2s",
+                "98s", "97s", "96s", "95s", "94s", "93s", "92s",
+                "87s", "86s", "85s", "84s", "83s", "82s",
+                "76s", "75s", "74s", "73s", "72s",
+                "65s", "64s", "63s", "62s",
+                "54s", "53s", "52s",
+                "43s", "42s",
+                "32s",
+                "AKo", "AQo", "AJo", "ATo", "A9o", "A8o", "A7o", "A6o", "A5o", "A4o", "A3o", "A2o",
+                "KQo", "KJo", "KTo", "K9o", "K8o", "K7o", "K6o", "K5o", "K4o", "K3o", "K2o",
+                "QJo", "QTo", "Q9o", "Q8o", "Q7o", "Q6o", "Q5o", "Q4o", "Q3o", "Q2o",
+                "JTo", "J9o", "J8o", "J7o", "J6o", "J5o", "J4o", "J3o", "J2o",
+                "T9o", "T8o", "T7o", "T6o", "T5o", "T4o", "T3o", "T2o",
+                "98o", "97o", "96o", "95o", "94o", "93o", "92o",
+                "87o", "86o", "85o", "84o", "83o", "82o",
+                "76o", "75o", "74o", "73o", "72o",
+                "65o", "64o", "63o", "62o",
+                "54o", "53o", "52o",
+                "43o", "42o",
+                "32o"
+            ];
+
+            let selectedPosition = "";
+            let currentHand = "";
+            let correctCount = 0;
+            let incorrectCount = 0;
+
+            function startPractice() {
+                const positionSelect = document.getElementById("position-select");
+                selectedPosition = positionSelect.value;
+                correctCount = 0;
+                incorrectCount = 0;
+                updateTracker();
+                document.getElementById("feedback").textContent = "";
+                document.getElementById("feedback").className = "feedback";
+                pickRandomHand();
+                document.querySelectorAll("button[onclick^='checkAnswer']").forEach(button => button.disabled = false);
+            }
+
+            function pickRandomHand() {
+                const randomIndex = Math.floor(Math.random() * startingHands.length);
+                currentHand = startingHands[randomIndex];
+                document.getElementById("hand").textContent = currentHand;
+            }
+
+            function checkAnswer(action) {
+                const isRaise = handsByPosition[selectedPosition].includes(currentHand);
+                const correctDecision = isRaise ? "raise" : "fold";
+                const userCorrect = (action === correctDecision);
+
+                const feedback = document.getElementById("feedback");
+                if (userCorrect) {
+                    correctCount++;
+                    feedback.textContent = `Correct! ${currentHand} should be a ${correctDecision}.`;
+                    feedback.className = "feedback correct";
+                } else {
+                    incorrectCount++;
+                    feedback.textContent = `Incorrect! ${currentHand} should be a ${correctDecision}.`;
+                    feedback.className = "feedback incorrect";
+                }
+                updateTracker();
+                pickRandomHand();
+            }
+
+            function updateTracker() {
+                document.getElementById("correct-count").textContent = correctCount;
+                document.getElementById("incorrect-count").textContent = incorrectCount;
+            }
+        </script>
+    </body>
 </html>

@@ -67,20 +67,19 @@
         </style>
     </head>
     <body>
-        <h1>Preflop Charts by Table Position</h1>
+        <h1>8-Max Preflop Charts by Table Position</h1>
         <button class="return-button" onclick="window.location.href='index.html'">Return to Practice</button>
         <div id="charts"></div>
         <button class="return-button" onclick="window.location.href='index.html'">Return to Practice</button>
 
         <script>
             const tablePositions = [
-                { name: "UTG", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A5s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo"] },
-                { name: "UTG+1", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A5s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "QTs", "A4s", "K9s", "88"] },
-                { name: "Middle Position", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A5s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "QTs", "A4s", "K9s", "A7s", "A6s", "88", "77", "66", "KJo", "T9s"] },
-                { name: "Low Jack", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A5s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "QTs", "A4s", "K9s", "A7s", "A6s", "88", "77", "66", "KJo", "T9s", "A3s", "ATo", "K8s", "Q9s", "J9s"] },
-                { name: "High Jack", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s", "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "QJs", "QTs", "Q9s", "JTs", "J9s", "T9s", "98s", "AKo", "AQo", "AJo", "ATo", "KQo", "KJo", "KTo", "QJo"] },
-                { name: "Cutoff", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s", "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "QJs", "QTs", "Q9s", "JTs", "J9s", "T9s", "98s", "AKo", "AQo", "AJo", "ATo", "KQo", "KJo", "KTo", "QJo", "K5s", "K4s", "Q8s", "J8s", "T8s", "87s", "76s", "A9o", "QTo", "JTo"] },
-                { name: "Button", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s", "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s", "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "Q3s", "JTs", "J9s", "J8s", "J7s", "T9s", "T8s", "T7s", "T6s", "98s", "97s", "96s", "87s", "86s", "76s", "65s", "54s", "AKo", "AQo", "AJo", "ATo", "A9o", "A8o", "A7o", "A6o", "A5o", "A4o", "KQo", "KJo", "KTo", "K9o", "K8o", "QJo", "QTo", "Q9o", "JTo", "J9o", "T9o"] }
+                { name: "UTG", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "A7s", "A6s", "A5s", "A4s", "K9s", "QTs", "88", "77"] },
+                { name: "UTG+1", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "A7s", "A6s", "A5s", "A4s", "K9s", "QTs", "88", "77", "66", "55", "ATo", "Q9s", "J9s", "T9s", "K8s"] },
+                { name: "Middle Position", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "A7s", "A6s", "A5s", "A4s", "K9s", "QTs", "88", "77", "66", "55", "ATo", "Q9s", "J9s", "T9s", "K8s", "A3s", "A2s", "K7s", "K6s", "98s", "KJo", "KTo", "44", "33", "22"] },
+                { name: "High Jack", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "A7s", "A6s", "A5s", "A4s", "K9s", "QTs", "88", "77", "66", "55", "ATo", "Q9s", "J9s", "T9s", "K8s", "A3s", "A2s", "K7s", "K6s", "98s", "KJo", "KTo", "QJo", "QTo", "JTo", "K5s", "K4s", "Q8s", "J8s", "T8s", "44", "33", "22", "87s", "76s", "65s", "54s", "97s"] },
+                { name: "Cutoff", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "AKo", "AQo", "AJo", "KQs", "KJs", "KTs", "JTs", "QJs", "KQo", "A7s", "A6s", "A5s", "A4s", "K9s", "QTs", "88", "77", "66", "55", "ATo", "Q9s", "J9s", "T9s", "K8s", "A3s", "A2s", "K7s", "K6s", "98s", "KJo", "KTo", "QJo", "QTo", "JTo", "K5s", "K4s", "Q8s", "J8s", "T8s", "44", "33", "22", "87s", "76s", "65s", "54s", "97s", "A9o", "A8o", "A5o", "K9o", "Q9o", "Q7s", "Q6s", "Q5s", "K3s", "K2s", "J7s", "T7s", "T9o"] },
+                { name: "Button", hands: ["AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s", "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s", "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "Q3s", "JTs", "J9s", "J8s", "J7s", "T9s", "T8s", "T7s", "T6s", "98s", "97s", "96s", "87s", "86s", "76s", "65s", "54s", "AKo", "AQo", "AJo", "ATo", "A9o", "A8o", "A7o", "A6o", "A5o", "A4o", "KQo", "KJo", "KTo", "K9o", "K8o", "QJo", "QTo", "Q9o", "JTo", "J9o", "T9o", "J6s", "A3o", "A2o", "Q2s", "75s", "64s", "Q8o", "J8o", "T8o", "98o", "K7o", "K6o", "K5o", "87o"] }
             ];
 
             // Generate rows and columns of starting hands
